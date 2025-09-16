@@ -1,57 +1,89 @@
 import React, { useEffect, useState } from "react";
-import { db, auth } from "../firebase";
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 export default function Wallet() {
-  const [balance, setBalance] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [wallet, setWallet] = useState(0);
+  const [rechargeAmount, setRechargeAmount] = useState("");
+  const [showRechargeInput, setShowRechargeInput] = useState(false);
 
   useEffect(() => {
-    if (auth.currentUser) {
-      fetchWallet(auth.currentUser.uid);
-    }
+    const fetchWallet = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        setWallet(userSnap.data().wallet || 0);
+      }
+    };
+
+    fetchWallet();
   }, []);
 
-  // Fetch wallet balance
-  const fetchWallet = async (uid) => {
-    setLoading(true);
-    const walletRef = doc(db, "wallets", uid);
-    const walletSnap = await getDoc(walletRef);
-    if (walletSnap.exists()) {
-      setBalance(walletSnap.data().balance);
-    } else {
-      // Create wallet if it doesn't exist
-      await setDoc(walletRef, { balance: 0 });
-      setBalance(0);
+  const handleRecharge = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please log in first.");
+      return;
     }
-    setLoading(false);
-  };
 
-  // Recharge wallet (for now fixed ₹100)
-  const rechargeWallet = async () => {
-    if (!auth.currentUser) return alert("Login required!");
-    const walletRef = doc(db, "wallets", auth.currentUser.uid);
+    const amount = parseFloat(rechargeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Enter a valid recharge amount.");
+      return;
+    }
 
-    const newBalance = balance + 100;
-    await updateDoc(walletRef, { balance: newBalance });
-    setBalance(newBalance);
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const currentWallet = userSnap.data().wallet || 0;
+      const newWallet = currentWallet + amount;
+
+      await updateDoc(userRef, { wallet: newWallet });
+      setWallet(newWallet);
+      setRechargeAmount("");
+      setShowRechargeInput(false);
+      alert(`Wallet recharged! New Balance: ₹${newWallet}`);
+    }
   };
 
   return (
-    <div className="p-6 bg-blue-100 rounded-lg shadow-md text-center">
-      <h2 className="text-xl font-bold mb-2">E-Wallet</h2>
-      {loading ? (
-        <p>Loading...</p>
+   <div className="wallet-container">
+      <h2 className="wallet-title">Wallet</h2>
+      <p className="wallet-balance">
+        <strong>Current Balance:</strong> ₹{wallet}
+      </p>
+
+      {!showRechargeInput ? (
+        <button 
+          onClick={() => setShowRechargeInput(true)} 
+          className="wallet-btn recharge-btn"
+        >
+          Recharge
+        </button>
       ) : (
-        <>
-          <p className="text-2xl font-bold text-green-700">₹{balance}</p>
-          <button
-            onClick={rechargeWallet}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Recharge +₹100
+        <div className="wallet-recharge-box">
+          <input
+            type="number"
+            placeholder="Enter amount"
+            value={rechargeAmount}
+            onChange={(e) => setRechargeAmount(e.target.value)}
+            className="wallet-input"
+          />
+          <button onClick={handleRecharge} className="wallet-btn confirm-btn">
+            Confirm
           </button>
-        </>
+          <button 
+            onClick={() => setShowRechargeInput(false)} 
+            className="wallet-btn cancel-btn"
+          >
+            Cancel
+          </button>
+        </div>
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 {
   "name": "canteenapp",
   "version": "0.1.0",
-  "homepage": "https://iamsannoy.github.io/smart-canteen-app/"
+  "homepage": "https://iamsannoy.github.io/smart-canteen-app"
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",

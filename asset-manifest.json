@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/smart-canteen-app/static/css/main.0ae4daa3.css",
-    "main.js": "/smart-canteen-app/static/js/main.cf739777.js",
+    "main.js": "/smart-canteen-app/static/js/main.9c011114.js",
     "static/js/453.88a2e189.chunk.js": "/smart-canteen-app/static/js/453.88a2e189.chunk.js",
     "index.html": "/smart-canteen-app/index.html",
     "main.0ae4daa3.css.map": "/smart-canteen-app/static/css/main.0ae4daa3.css.map",
-    "main.cf739777.js.map": "/smart-canteen-app/static/js/main.cf739777.js.map",
+    "main.9c011114.js.map": "/smart-canteen-app/static/js/main.9c011114.js.map",
     "453.88a2e189.chunk.js.map": "/smart-canteen-app/static/js/453.88a2e189.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0ae4daa3.css",
-    "static/js/main.cf739777.js"
+    "static/js/main.9c011114.js"
   ]
 }
